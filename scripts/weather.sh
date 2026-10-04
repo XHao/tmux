@@ -62,18 +62,22 @@ function format_weather_info() {
   _location="${_raw##*"${DELIM}"}"                                 # slice weather and temp to get location
   [ "${_location//[^,]/}" == ",," ] && _location="${_location%,*}" # slice country if it exists
 
+  # wttr.in's %C returns full WorldWeatherOnline condition phrases (e.g.
+  # "Mist", "Fog", "Patchy rain nearby", "Light snow shower"), not single
+  # words; match on patterns so unmapped conditions don't fall through to
+  # the sunny icon
   case "$_weather" in
-  'snow')
-    _weather='❄'
-    ;;
-  'rain' | 'shower')
-    _weather='☂'
-    ;;
-  'overcast' | 'cloud')
-    _weather='☁'
-    ;;
   'na')
     _weather=''
+    ;;
+  *snow* | *sleet* | *ice* | *freez* | *blizzard*)
+    _weather='❄'
+    ;;
+  *rain* | *shower* | *drizzle* | *thunder*)
+    _weather='☂'
+    ;;
+  *overcast* | *cloud* | *mist* | *fog* | *haze*)
+    _weather='☁'
     ;;
   *)
     _weather='☀'
