@@ -159,6 +159,14 @@ parse_battery_status()
 
 main()
 {
+  # omit the whole segment (empty output) while drawing from AC; needs
+  # @dracula-show-empty-plugins off for tmux to drop the segment cleanly
+  hide_on_ac=$(get_tmux_option "@dracula-battery-hide-on-ac" false)
+  if $hide_on_ac && [ "$(uname -s)" = "Darwin" ] \
+    && pmset -g batt | grep -q "AC Power"; then
+    exit 0
+  fi
+
   # get left most custom label
   bat_label=$(get_tmux_option "@dracula-battery-label" "♥")
   if [ "$bat_label" == false ]; then
