@@ -38,7 +38,10 @@ function fetch_weather_information() {
   # Drop response body when status code >= 400 and return nonzero by passing the
   # `--fail` flag. Execute curl last to allow the consumer to leverage the
   # return code. Pass `--show-error` and redirect stderr for the consumer.
-  command -p curl -L --silent --fail --show-error \
+  # --max-time 5 caps the whole fetch: the caller's `timeout 1` precheck only
+  # bounds the TCP connect, a response that stalls mid-transfer would otherwise
+  # hang the status #() job until the TCP timeout (minutes).
+  command -p curl -L --silent --fail --show-error --max-time 5 \
     "${API_URL}/${_location// /%20}?format=%C${DELIM}%t${DELIM}%l&${_unit}" 2>&1
 }
 
